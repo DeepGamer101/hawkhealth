@@ -3,8 +3,7 @@
 > **Mentor's note.** Welcome to the team. You're not starting from a blank editor — you're
 > joining a project already in motion. This week has two jobs, and neither is "write code":
 > **(1) *see* concurrency** with your own eyes in Wokwi, and **(2) get oriented** in the
-> HawkHealth codebase you'll grow all semester. Low stakes, high confidence. We build the
-> habits before we lean on them.
+> HawkHealth codebase you'll grow all semester. 
 
 **The idea that ties the whole course together — start noticing it today:** an RTOS is a
 *portable layer*. The task you build in Wokwi this week is the same shape you'll run on the
@@ -23,7 +22,7 @@ You need three things. If you already have any from the CI walkthrough, skip ahe
 
 1. **GitHub account** — [github.com](https://github.com). You'll clone the repo and, later, open pull requests.
 2. **Wokwi account** — [wokwi.com](https://wokwi.com) → *Sign up* (free for personal use). This is our browser simulator for RTOS concepts.
-3. **Git** — either the `git` command line **or** [GitHub Desktop](https://desktop.github.com) (friendlier; it handles login for you).
+3. **Git** —  [GitHub Desktop](https://desktop.github.com) 
 
 **Checkpoint 0.** You can open both `github.com` and `wokwi.com`, signed in, on your Dunwoody laptop.
 
@@ -47,8 +46,8 @@ whole point of an RTOS.
    **[`wokwi/week01/sketch.ino`](../wokwi/week01/sketch.ino)**.
 4. **Add the FreeRTOS library.** Open the **Library Manager** tab (in the file list, next to
    `sketch.ino` / `diagram.json`) → click **+ Add** → search **`STM32duino FreeRTOS`** → add it.
-   This is what makes `#include "FreeRTOS.h"` / `#include "task.h"` resolve. *(Skip this and the
-   sketch won't compile — "FreeRTOS.h: No such file or directory.")*
+   This provides `#include <STM32FreeRTOS.h>`. *(Skip this and the sketch won't compile —
+   "STM32FreeRTOS.h: No such file or directory.")*
 5. Press the green **▶ Play** button.
 
 **What you should see:**
@@ -59,13 +58,10 @@ whole point of an RTOS.
 That interleaving is the scheduler doing its job: two `for(;;)` loops that each think they own
 the CPU, taking turns because each one **blocks** (`vTaskDelay`) instead of spinning.
 
-> ⚠ **First-run note.** This sketch is matched to a *known-working* Wokwi C031C6 FreeRTOS
-> project, but Wokwi's STM32 support moves around and I couldn't run it in my own sandbox — so
-> the first play is a real verification. Two Wokwi quirks are already handled in the sketch:
-> you include `FreeRTOS.h`/`task.h` directly, and you **don't** call `vTaskStartScheduler()`
-> (Wokwi's Arduino core starts it for you after `setup()`). If the board or an include still
-> errors, **stop and tell your instructor** — the fallback is the STM32 "blue pill" F103.
-> Everything downstream (Renode, hardware) is already proven; this is the one rung we confirm live.
+> ✅ **Two Wokwi rules baked into the sketch:** include FreeRTOS via `#include <STM32FreeRTOS.h>`
+> (from the **STM32duino FreeRTOS** library you added in step 4), and call `vTaskStartScheduler()`
+> at the end of `setup()` to start the scheduler. If nothing blinks and the Serial Monitor is
+> empty, those two are the first things to check.
 
 **Look at the task bodies and connect them to HawkHealth.** In the sketch, each task is:
 
@@ -79,19 +75,20 @@ void TaskA(void *pv) {
 }
 ```
 
-Now peek ahead at HawkHealth's blink task (`firmware/src/app/hawkhealth_hello.c`):
+Now peek at HawkHealth's blink task — HEALTH's status-LED heartbeat in
+`firmware/src/health/hh_health.c` (simplified to its essence):
 
 ```c
-void vTaskA_LedBlink(void *pv) {
+void HH_Health_Task(void *pv) {
     for (;;) {
         hh_led_toggle();                 // <-- I/O (the platform seam)
-        vTaskDelay(pdMS_TO_TICKS(500));  // <-- FreeRTOS (identical call)
+        vTaskDelay(pdMS_TO_TICKS(500));  // <-- FreeRTOS (identical call shape)
     }
 }
 ```
 
-Same `xTaskCreate` / `vTaskDelay` skeleton. **Only the I/O lines differ** — `digitalWrite`/`Serial`
-here, `hh_led_toggle`/`hh_putc` there. That difference *is* the platform seam, and it's why the
+Same `for(;;)` / `vTaskDelay` skeleton. **Only the I/O line differs** — `digitalWrite`/`Serial`
+here, `hh_led_toggle` there. That difference *is* the platform seam, and it's why the
 same task survives the jump from an M0+ to an M7 to real silicon.
 
 **Checkpoint 1.** Two LEDs blinking at different rates, and interleaved `A`/`B` lines in the
@@ -130,21 +127,21 @@ the work.
    | `tests/` | the Renode smoke + integration tests (the CI gate) |
    | `platforms/` | `hawkhealth_f767.repl` — the Renode model of our chip |
 
-3. **Trace one reading, end to end.** Start in `firmware/src/sensor/sensor_hal.c` at
+3. **Trace one reading, end to end.** Start in `firmware/src/sensor/hh_sensor.c` at
    `HH_Sensor_Read()` (where a reading is born), and follow where a task would send it out:
    `hh_println()` → `hh_putc()` in `firmware/src/platform/hh_platform.c` (where bytes hit
    USART3). You've just traced SENSOR → TELEMETRY.
 4. **Find the two seams** — the two files that would change if you swapped the board or the
    sensor, while the tasks stayed put:
    - `firmware/src/platform/hh_platform.c` — the **I/O seam**
-   - `firmware/src/sensor/sensor_hal.c` — the **stub ↔ real-sensor seam**
+   - `firmware/src/sensor/hh_sensor.c` — the **stub ↔ real-sensor seam**
 
 > *Optional, if you're curious:* the repo builds with one command if you have
 > `arm-none-eabi-gcc` — `make -C firmware`. You don't need to today; we'll build it properly in
 > Renode in Week 5. Reading is this week's job.
 
 **Checkpoint 3.** You can point to `hh_platform.c` and say "this is the I/O seam," and to
-`sensor_hal.c` and say "this is the sensor seam."
+`hh_sensor.c` and say "this is the sensor seam."
 
 ---
 
