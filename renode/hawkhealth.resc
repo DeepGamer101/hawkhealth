@@ -1,0 +1,8 @@
+:name: HawkHealth (STM32F767)
+:description: Run the HawkHealth system in Renode and watch telemetry on USART3.
+
+using sysbus
+mach create "hawkhealth"
+machine LoadPlatformDescription @C:/Users/bronat/CENG4200/hawkhealth/platforms/hawkhealth_f767.repl
+sysbus LoadELF @C:/Users/bronat/Downloads/hawkhealth-firmware/hawkhealth.elf
+showAnalyzer sysbus.usart3
