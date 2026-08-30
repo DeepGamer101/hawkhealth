@@ -1,16 +1,17 @@
 /* HawkHealth — Week 1 RTOS concept sketch (Wokwi, ST Nucleo-C031C6).
  *
- * Two independent FreeRTOS tasks on a real ST Nucleo. The point of this sketch is
- * to SEE concurrency: two for(;;) loops that each act like they own the CPU, taking
- * turns because each one BLOCKS (vTaskDelay) instead of spinning.
+ * Two independent FreeRTOS tasks on a real ST Nucleo. The point is to SEE concurrency:
+ * two for(;;) loops that each act like they own the CPU, taking turns because each one
+ * BLOCKS (vTaskDelay) instead of spinning.
  *
  * Notice the shape: xTaskCreate + vTaskDelay are the EXACT FreeRTOS calls HawkHealth
  * uses on the STM32F767. Only the I/O lines (digitalWrite / Serial) differ from
  * HawkHealth's hh_led_toggle() / hh_putc(). That difference is the "platform seam."
  *
- * FIRST-RUN NOTE: this is a starter.  Wokwi uses the Arduino framework for STM32.
+ * REQUIRED LIBRARY: Wokwi Library Manager -> + Add -> "STM32duino FreeRTOS".
+ * That library provides <STM32FreeRTOS.h>. Wokwi uses the Arduino framework for STM32.
  */
-#include <STM32FreeRTOS.h> /*Make sure that STM32duino FreeRTOS has been added in Library Manager*/
+#include <STM32FreeRTOS.h>   /* add "STM32duino FreeRTOS" in the Library Manager first */
 
 #define LED_A LED_BUILTIN   /* on-board LED (PA5 on the Nucleo-C031C6) */
 #define LED_B PB1           /* second LED you add in the Wokwi diagram */
@@ -39,8 +40,7 @@ void setup() {
     Serial.begin(115200);
     xTaskCreate(TaskA, "TaskA", 128, NULL, 1, NULL);
     xTaskCreate(TaskB, "TaskB", 128, NULL, 1, NULL);
-    vTaskStartScheduler();              /* never returns */
+    vTaskStartScheduler();              /* start the scheduler (required) */
 }
 
 void loop() { }                         /* unused: the scheduler runs everything */
-

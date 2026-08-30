@@ -3,7 +3,8 @@
 > **Mentor's note.** Welcome to the team. You're not starting from a blank editor — you're
 > joining a project already in motion. This week has two jobs, and neither is "write code":
 > **(1) *see* concurrency** with your own eyes in Wokwi, and **(2) get oriented** in the
-> HawkHealth codebase you'll grow all semester. 
+> HawkHealth codebase you'll grow all semester. Low stakes, high confidence. We build the
+> habits before we lean on them.
 
 **The idea that ties the whole course together — start noticing it today:** an RTOS is a
 *portable layer*. The task you build in Wokwi this week is the same shape you'll run on the
@@ -22,7 +23,7 @@ You need three things. If you already have any from the CI walkthrough, skip ahe
 
 1. **GitHub account** — [github.com](https://github.com). You'll clone the repo and, later, open pull requests.
 2. **Wokwi account** — [wokwi.com](https://wokwi.com) → *Sign up* (free for personal use). This is our browser simulator for RTOS concepts.
-3. **Git** —  [GitHub Desktop](https://desktop.github.com) 
+3. **Git** — either the `git` command line **or** [GitHub Desktop](https://desktop.github.com) (friendlier; it handles login for you).
 
 **Checkpoint 0.** You can open both `github.com` and `wokwi.com`, signed in, on your Dunwoody laptop.
 

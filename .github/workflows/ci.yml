@@ -23,6 +23,13 @@ jobs:
           make -C firmware
           make -C firmware TEST=1
 
+      - name: Publish firmware (.elf) for local Renode runs
+        uses: actions/upload-artifact@v4
+        with:
+          name: hawkhealth-firmware
+          path: firmware/hawkhealth.elf
+          if-no-files-found: error
+
       - name: Install Renode
         run: |
           RENODE=1.16.1
