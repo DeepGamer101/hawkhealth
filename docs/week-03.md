@@ -1,129 +1,93 @@
-# Week 3 Lab — Dev-Tools
+# Week 4 Lab — Understanding Super-Loops
 
-> **Mentor's note.** This week you set up the tools you'll use for the rest of the semester and
-> run the real HawkHealth system on your own machine for the first time. Two installs
-> (STM32CubeIDE and Renode), one satisfying payoff (watch the pipeline stream telemetry in the
-> emulator), and one deliverable (**your interface-spec section is due**). No firmware changes yet
-> — this is about your bench.
+> **Mentor's note.** Before you appreciate what an RTOS gives you, you have to feel life without
+> one. This week you build the simplest possible "scheduler" — a super-loop — and run straight
+> into its wall. It's a short lab with a big "aha," plus one milestone: **the interface spec
+> freezes today.**
 
-**By the end you will have:** CubeIDE and Renode installed, HawkHealth running in Renode from a
-CI-built firmware, and your subsystem's interface-spec draft committed.
-
----
-
-## Part 1 — Install STM32CubeIDE (your editor now, your hardware debugger later)
-
-STM32CubeIDE is the IDE the course and the textbook use. You'll browse and edit HawkHealth in it
-now, and use it to flash and debug the real board in Weeks 9+.
-
-1. Download STM32CubeIDE: https://www.st.com/en/development-tools/stm32cubeide.html
-   (OS: Windows, version **1.18.1**; make a free MyST account when prompted).
-2. Install with default options. First launch: pick a workspace folder.
-3. **Open HawkHealth in it:** **File → Open Projects from File System… → Directory…** → select your
-   cloned `hawkhealth` folder → Finish. You can now navigate the whole codebase with a real IDE —
-   jump to definitions, search symbols, read `firmware/src/…`.
-
-> You are **not** building in CubeIDE this week — the grading loop builds in CI, and local Renode
-> runs use the CI-built firmware (Part 3). CubeIDE here is your reading/editing tool; its build +
-> debug role arrives with real hardware.
-
-**Checkpoint 1.** CubeIDE opens and you can browse `firmware/src/` and open `hh_sensor.c`.
+**By the end you will:** have watched a super-loop fail to keep two independent timings, understand
+*why*, and have your interface-spec section finalized and frozen.
 
 ---
 
-## Part 2 — Install Renode (the Stage-2 emulator)
+## Part 1 — The super-loop, and where it breaks (Wokwi)
 
-Renode runs the actual STM32F767 firmware with no board. You'll use it heavily in Weeks 5–8.
+A **super-loop** is `setup()` once, then everything else in one `loop()` that runs forever, doing
+each job in sequence. No tasks, no scheduler — *you* are the scheduler. It's how nearly every
+embedded system starts, and for simple jobs it's perfect.
 
-1. Go to **https://builds.renode.io/** and download the latest
-   **`renode-*.windows-portable-dotnet.zip`** (a nightly — it ships the models we need).
-2. Unzip to a simple path, e.g. `C:\renode\`. No installer; it's a self-contained folder.
-3. Launch **`Renode.exe`** from that folder. A **Monitor** window opens with a `(monitor)` prompt.
+We'll ask it to do something that sounds trivial: blink one LED every **250 ms** and another every
+**750 ms** — at the same time.
 
-> Why a nightly and not the stable release: the stable build predates some of the STM32F7
-> peripheral models. The nightly ships them. (Same reason from the setup guide.)
+1. In Wokwi: **New Project → STM32 → ST Nucleo C031C6** (same board as before).
+2. Paste **[`wokwi/week04/sketch.ino`](../wokwi/week04/sketch.ino)**. *(No library to add this week —
+   there's no FreeRTOS here. That's the point.)*
+3. In the diagram, add an **LED on PB1** (anode → PB1, cathode → GND) — same as Weeks 1–2.
+4. Press **▶ Play** and open the **Serial Monitor**.
 
-**Checkpoint 2.** Renode launches and shows the `(monitor)` prompt.
+**What you'll see — three failures at once:**
+1. **The two blinkers couple.** Both LEDs blink at the *same* ~1 Hz rate, not 250 / 750 ms.
+   Consecutive `A @ …` lines are ~**1000 ms** apart (`250 + 750`), because the delays run in
+   sequence — A can't blink until B's `delay(750)` finishes.
+2. **The CRITICAL job misses its deadline — by ~10×.** The `!! CRITICAL check` line prints its
+   *actual* gap: it wants to run every **100 ms**, but the gap reads ~**1000 ms**. It only reaches
+   the top of `loop()` once per pass. In a bedside monitor, that's a **missed alarm**.
+3. **The timing JITTERS.** Every 4th pass a "slow sensor read" adds 400 ms, so the critical gap
+   jumps to ~**1400 ms** — unpredictably. You can no longer say *when* the critical check will run.
 
----
+**Why?** Every job waits its turn behind every other job's `delay()`. With just two blinkers you can
+do the arithmetic (`250 + 750 = 1000`). But add a hard **100 ms deadline** and one **variable-time**
+job, and the schedule is already impossible to predict — and real systems have *many* jobs. A
+super-loop gives you no way to say "this critical check matters more than that slow read."
 
-## Part 3 — Run HawkHealth in Renode (first local run of the real system)
+> **Cast your mind back to Week 1.** Two FreeRTOS *tasks* blinked at 250 ms and 750 ms perfectly and
+> independently — because each task had its own `vTaskDelay`, and the scheduler ran them
+> concurrently. That **decoupling** is the whole reason an RTOS exists. It's exactly what HawkHealth
+> uses (the system you ran in Renode last week), and it's what Week 5 dives into.
 
-You don't build locally — you fetch the firmware your **CI already built**, then run it.
+**Checkpoint 1.** You can point to the `!! CRITICAL` line and say why its gap is ~1000 ms instead of
+100 — and why adding jobs makes a super-loop's timing impossible to predict.
 
-1. **Get the firmware from CI.** On your repo's GitHub page → **Actions** tab → click the most
-   recent green run → scroll to **Artifacts** → download **`hawkhealth-firmware`**. It arrives as a
-   **zip** — you must **unzip it** to get **`hawkhealth.elf`** as a real file. Then note its exact,
-   full path (right-click → Properties, or copy it from Explorer's address bar).
-   > If `LoadELF` later errors with *"Parameters did not match the signature,"* the path is wrong —
-   > the file is still zipped, is one folder deeper, or the name is off (turn on "File name
-   > extensions" in Explorer to check it's not `hawkhealth.elf.elf`).
-   > *Dev-tools lesson:* CI doesn't just test — it **builds and publishes artifacts**. This `.elf`
-   > is the exact binary that passed the tests.
-2. **Edit the run script.** Open `renode/hawkhealth.resc` from your clone in a text editor. Change
-   the **two paths** to absolute paths on your machine (forward slashes, no quotes):
-   - the platform file: `<your-clone>/platforms/hawkhealth_f767.repl`
-   - the firmware you just downloaded: `<...>/hawkhealth.elf`
-   *(The script loads the ELF on a plain `sysbus LoadELF` line — no macro block to fuss with.)*
-3. **Run it.** In the Renode Monitor, `include` the **run script** (`renode/hawkhealth.resc`) —
-   **not** the platform `.repl` file. The `.resc` is what loads *both* the hardware model and your
-   firmware; the `.repl` alone loads no firmware (you'll see `PC = 0x0, SP = 0x0` and a flood of
-   "non existing peripheral" warnings — that means no `.elf` was loaded).
-   ```
-   Clear
-   include @C:/path/to/your/hawkhealth/renode/hawkhealth.resc
-   start
-   ```
-   (`include`, not `install`; point at the **.resc**; `@` prefix; forward slashes; no quotes.)
-4. A **`hawkhealth:sysbus.usart3`** window opens. You should see the telemetry stream:
-   ```
-   [HawkHealth] system starting
-   [HH] t=1000 temp=36.8 spo2=98.0 hr=73 alert=NONE
-   [HH] t=2000 ...
-   ```
-   Let it run ~30 seconds and you'll see the injected faults become alerts:
-   `... temp=38.5 ... alert=HIGH` (call 300) and `... spo2=88.0 ... alert=CRITICAL` (call 500).
-
-> Blank USART window or an error? It's almost always a path (use absolute, forward slashes, no
-> quotes) or that you forgot `start`. If it's stuck, `Clear` and re-`include`.
-
-**Checkpoint 3.** The `usart3` window streams `[HH] t=… temp=… alert=…` lines — HawkHealth running
-on the emulated F767, on your machine.
+> *(Curious? A super-loop **can** juggle timings without `delay()` by checking `millis()` and doing
+> work only when enough time has passed — but you have to hand-track every job's deadline yourself.
+> That bookkeeping is exactly what the RTOS scheduler does for you. You don't need to build that
+> this week — just know it's the trade.)*
 
 ---
 
-## Part 4 — Your interface-spec draft (**due this week**)
+## Part 2 — The interface spec FREEZES (milestone)
 
-You own one subsystem. This week you author its section of the frozen interface spec.
+Your spec draft was due last week. **This week it locks.**
 
-1. Open **`docs/interface-spec.md`** and find your subsystem's section (S1–S7).
-2. Fill in the **Owner:** line with your name, and flesh out your subsystem's contract: what each
-   public function promises, what it consumes/produces, and any invariants (e.g., "call `Init`
-   before the first read"). Match the actual header in `firmware/include/hh_<name>.h`.
-3. Commit on a branch and open a **pull request** (`git`/GitHub Desktop):
-   - branch: `spec-draft-<yourname>`, commit message `Interface spec draft — <SUBSYSTEM>`
-   - open the PR; confirm **CI stays green** (you only edited a doc).
+1. Finalize your subsystem's section in **`docs/interface-spec.md`** — signatures, what each function
+   promises, what it consumes/produces. Make sure it matches your real header
+   `firmware/include/hh_<name>.h` exactly.
+2. Commit and open (or update) your PR; confirm **CI is green**.
+3. **From now on, the spec is frozen.** Changing a public function signature requires a *spec
+   revision* — a deliberate, announced change — because the whole system (and every teammate's
+   mental model) is built against these contracts. This is exactly how a real team protects a shared
+   interface.
 
-> This is a *draft*. In Week 4 the spec **freezes** — after that, changing a public signature needs
-> a spec revision, because everyone codes against it.
-
-**Checkpoint 4.** Your spec section is filled in, pushed on a PR, and CI is green.
+**Checkpoint 2.** Your spec section is final, matches your header, and is merged (or in a green PR).
 
 ---
 
 ## Exit criteria
 
-- [ ] CubeIDE installed; you can browse HawkHealth in it.
-- [ ] Renode installed; HawkHealth's telemetry streams in the `usart3` window.
-- [ ] Your interface-spec section is drafted and pushed on a PR (CI green).
+- [ ] The Wokwi super-loop runs; you've seen the two LEDs lock to the same rate and can explain why.
+- [ ] Your interface-spec section is finalized (frozen) and in a green PR.
 
 ## What to submit (weekly milestone)
 
-1. A **screenshot** of the Renode `usart3` window showing an `alert=HIGH` or `alert=CRITICAL` line.
-2. The **link to your interface-spec PR**.
-3. Your **AI Interaction Log** entry for Week 3.
+1. A **screenshot** of the Serial Monitor showing a `!! CRITICAL check` line whose **gap** is ~1000 ms
+   (target 100) — the missed deadline.
+2. **One or two sentences:** why does the CRITICAL job miss its 100 ms deadline, why does the timing
+   jitter, and what decouples all of this?
+3. The **link to your (final) interface-spec PR**.
+4. Your **AI Interaction Log** entry for Week 4.
 
-## What you are *not* doing yet
+## What's next
 
-No firmware changes, no hardware. You built your bench and ran the system. Next week: super-loops
-(and the spec freezes).
+You've felt the super-loop's wall. **Week 5** begins the RTOS: tasks and the scheduler — the tools
+that make HawkHealth's independent, concurrent jobs possible. The simulator shifts from Wokwi to
+**Renode**, and you'll start working in the real codebase.

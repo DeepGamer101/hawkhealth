@@ -1,4 +1,4 @@
-# Week 2 Lab — STM32 Dev-Board & MCU Architecture
+# Week 2a Lab — STM32 Dev-Board & MCU Architecture
 
 > **Mentor's note.** Last week you saw tasks *run*. This week you look *under* them — at the
 > chip itself: where code lives, where data lives, how the CPU knows what to do when it powers
