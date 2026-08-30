@@ -1,4 +1,4 @@
-/* HawkHealth — Week 4 concept sketch (Wokwi, ST Nucleo-C031C6).
+/* HawkHealth — Week 3 concept sketch (Wokwi, ST Nucleo-C031C6).
  *
  * THE SUPER-LOOP, AND WHY IT DOESN'T SCALE. No RTOS this week -- just setup() and one loop()
  * running every job in sequence. Watch three things go wrong at once:
