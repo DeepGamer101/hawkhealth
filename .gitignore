@@ -1,0 +1,8 @@
+# build output
+firmware/*.elf
+# local Renode install + test results
+renode/
+renode-*.tar.gz
+robot_output.xml
+log.html
+report.html
