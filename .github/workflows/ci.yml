@@ -1,0 +1,48 @@
+name: HawkHealth CI
+
+# Every push / PR: build both firmware variants and run them in Renode.
+# Make 'firmware-ci' a required status check to gate merges (the milestone gate).
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  firmware-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ARM toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi
+
+      - name: Build (demo + testbench)
+        run: |
+          make -C firmware
+          make -C firmware TEST=1
+
+      - name: Install Renode
+        run: |
+          RENODE=1.16.1
+          wget -q "https://github.com/renode/renode/releases/download/v${RENODE}/renode-${RENODE}.linux-portable-dotnet.tar.gz"
+          mkdir -p renode
+          tar xzf renode-*.linux-portable-dotnet.tar.gz -C renode --strip-components=1
+          pip install -r renode/tests/requirements.txt
+
+      - name: Run Renode tests
+        run: |
+          ./renode/renode-test tests/system.robot
+          ./renode/renode-test tests/integration.robot
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: renode-results
+          path: |
+            *.xml
+            log.html
+            report.html
+          if-no-files-found: ignore
