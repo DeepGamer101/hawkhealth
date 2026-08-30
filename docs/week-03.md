@@ -52,21 +52,29 @@ Renode runs the actual STM32F767 firmware with no board. You'll use it heavily i
 You don't build locally — you fetch the firmware your **CI already built**, then run it.
 
 1. **Get the firmware from CI.** On your repo's GitHub page → **Actions** tab → click the most
-   recent green run → scroll to **Artifacts** → download **`hawkhealth-firmware`**. Unzip it; inside
-   is **`hawkhealth.elf`**. Note where you saved it.
+   recent green run → scroll to **Artifacts** → download **`hawkhealth-firmware`**. It arrives as a
+   **zip** — you must **unzip it** to get **`hawkhealth.elf`** as a real file. Then note its exact,
+   full path (right-click → Properties, or copy it from Explorer's address bar).
+   > If `LoadELF` later errors with *"Parameters did not match the signature,"* the path is wrong —
+   > the file is still zipped, is one folder deeper, or the name is off (turn on "File name
+   > extensions" in Explorer to check it's not `hawkhealth.elf.elf`).
    > *Dev-tools lesson:* CI doesn't just test — it **builds and publishes artifacts**. This `.elf`
    > is the exact binary that passed the tests.
 2. **Edit the run script.** Open `renode/hawkhealth.resc` from your clone in a text editor. Change
    the **two paths** to absolute paths on your machine (forward slashes, no quotes):
    - the platform file: `<your-clone>/platforms/hawkhealth_f767.repl`
    - the firmware you just downloaded: `<...>/hawkhealth.elf`
-3. **Run it.** In the Renode Monitor:
+   *(The script loads the ELF on a plain `sysbus LoadELF` line — no macro block to fuss with.)*
+3. **Run it.** In the Renode Monitor, `include` the **run script** (`renode/hawkhealth.resc`) —
+   **not** the platform `.repl` file. The `.resc` is what loads *both* the hardware model and your
+   firmware; the `.repl` alone loads no firmware (you'll see `PC = 0x0, SP = 0x0` and a flood of
+   "non existing peripheral" warnings — that means no `.elf` was loaded).
    ```
+   Clear
    include @C:/path/to/your/hawkhealth/renode/hawkhealth.resc
    start
    ```
-   (`include`, not `install`; `@` prefix; forward slashes; no quotes — the path rules from the
-   setup guide.)
+   (`include`, not `install`; point at the **.resc**; `@` prefix; forward slashes; no quotes.)
 4. A **`hawkhealth:sysbus.usart3`** window opens. You should see the telemetry stream:
    ```
    [HawkHealth] system starting
