@@ -37,7 +37,7 @@ void hh_app_start(void){
     xTaskCreate(HH_Sensor_Task,    "SENSOR", configMINIMAL_STACK_SIZE,     NULL, tskIDLE_PRIORITY+2, NULL);
     xTaskCreate(HH_Filter_Task,    "FILTER", configMINIMAL_STACK_SIZE,     NULL, tskIDLE_PRIORITY+2, NULL);
     xTaskCreate(HH_Alert_Task,     "ALERT",  configMINIMAL_STACK_SIZE,     NULL, tskIDLE_PRIORITY+2, NULL);
-    xTaskCreate(HH_Telemetry_Task, "TELEM",  32,  NULL, tskIDLE_PRIORITY+1, NULL);
+    xTaskCreate(HH_Telemetry_Task, "TELEM",  configMINIMAL_STACK_SIZE,     NULL, tskIDLE_PRIORITY+1, NULL);
     xTaskCreate(HH_Command_Task,   "CMD",    configMINIMAL_STACK_SIZE+64,  NULL, tskIDLE_PRIORITY+3, NULL);
     xTaskCreate(HH_Health_Task,    "HEALTH", configMINIMAL_STACK_SIZE,     NULL, tskIDLE_PRIORITY+1, NULL);
 }
