@@ -14,7 +14,7 @@ CI-built firmware, and your subsystem's interface-spec draft committed.
 ## Part 1 — Install STM32CubeIDE (your editor now, your hardware debugger later)
 
 STM32CubeIDE is the IDE the course and the textbook use. You'll browse and edit HawkHealth in it
-now, and use it to flash and debug the real board in Weeks 9+.
+now, and use it to flash and debug the real board in Weeks 8+.
 
 1. Download STM32CubeIDE: https://www.st.com/en/development-tools/stm32cubeide.html
    (OS: Windows, version **1.18.1**; make a free MyST account when prompted).
@@ -33,7 +33,7 @@ now, and use it to flash and debug the real board in Weeks 9+.
 
 ## Part 2 — Install Renode (the Stage-2 emulator)
 
-Renode runs the actual STM32F767 firmware with no board. You'll use it heavily in Weeks 5–8.
+Renode runs the actual STM32F767 firmware with no board. You'll use it heavily in Weeks 4–7.
 
 1. Go to **https://builds.renode.io/** and download the latest
    **`renode-*.windows-portable-dotnet.zip`** (a nightly — it ships the models we need).
@@ -104,7 +104,7 @@ You own one subsystem. This week you author its section of the frozen interface 
    - branch: `spec-draft-<yourname>`, commit message `Interface spec draft — <SUBSYSTEM>`
    - open the PR; confirm **CI stays green** (you only edited a doc).
 
-> This is a *draft*. In Week 4 the spec **freezes** — after that, changing a public signature needs
+> This is a *draft*. In Week 3 the spec **freezes** — after that, changing a public signature needs
 > a spec revision, because everyone codes against it.
 
 **Checkpoint 4.** Your spec section is filled in, pushed on a PR, and CI is green.
@@ -121,7 +121,7 @@ You own one subsystem. This week you author its section of the frozen interface 
 
 1. A **screenshot** of the Renode `usart3` window showing an `alert=HIGH` or `alert=CRITICAL` line.
 2. The **link to your interface-spec PR**.
-3. Your **AI Interaction Log** entry for Week 3.
+3. Your **AI Interaction Log** entry for Week 2b.
 
 ## What you are *not* doing yet
 

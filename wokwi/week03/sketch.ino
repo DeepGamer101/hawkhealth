@@ -12,7 +12,7 @@
  *
  * With two jobs you can do the arithmetic. Add a hard deadline and a variable-time job and you
  * already can't predict when anything runs -- and real systems have many jobs. Decoupling all of
- * this is exactly what an RTOS scheduler does for you (Week 5).
+ * this is exactly what an RTOS scheduler does for you (Week 4).
  *
  * DIAGRAM: same as before -- an LED on PB1 (anode -> PB1, cathode -> GND). No library needed.
  */

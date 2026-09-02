@@ -1,4 +1,4 @@
-/* HawkHealth — Week 2 concept sketch (Wokwi, ST Nucleo-C031C6).
+/* HawkHealth — Week 2a concept sketch (Wokwi, ST Nucleo-C031C6).
  *
  * Chapter 2 hands-on: GPIO INPUT. One task blinks an LED; a second task polls a push
  * button and prints on each fresh press. Two independent FreeRTOS tasks, plus your first

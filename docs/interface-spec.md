@@ -1,6 +1,6 @@
 # HawkHealth — Interface Specification
 
-> **Status: FROZEN (Week 4).** These are the contracts every subsystem codes against. Once
+> **Status: FROZEN (Week 3).** These are the contracts every subsystem codes against. Once
 > frozen, you do **not** change a public signature without a spec revision — everyone builds
 > against these, so changing one quietly breaks everyone. Code against the interface, not the
 > implementation.

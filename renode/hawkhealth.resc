@@ -7,8 +7,8 @@
 #
 using sysbus
 mach create "hawkhealth"
-machine LoadPlatformDescription @C:/Users/bronat/CENG4200/hawkhealth/platforms/hawkhealth_f767.repl
-sysbus LoadELF @C:/Users/bronat/Downloads/hawkhealth-firmware/hawkhealth.elf
+machine LoadPlatformDescription @C:/Users/you/CENG4200/hawkhealth/platforms/hawkhealth_f767.repl
+sysbus LoadELF @C:/Users/you/Downloads/hawkhealth.elf
 showAnalyzer sysbus.usart3
 #
 # then, at the (hawkhealth) monitor prompt:  start

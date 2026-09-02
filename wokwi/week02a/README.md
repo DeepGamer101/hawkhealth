@@ -1,4 +1,4 @@
-# Week 2 — Wokwi GPIO-input sketch
+# Week 2a — Wokwi GPIO-input sketch
 
 Blink + pushbutton on the Nucleo-C031C6. See `docs/week-02.md` for the full lab.
 

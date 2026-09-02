@@ -1,4 +1,4 @@
-# Week 4 — Wokwi super-loop demo
+# Week 3 — Wokwi super-loop demo
 
 A plain Arduino super-loop (no FreeRTOS) that tries to blink two LEDs at two different rates
 in one loop() with delay() -- and can't. See `docs/week-04.md` for the lab.

@@ -1,4 +1,4 @@
-# Week 4 Lab — Understanding Super-Loops
+# Week 3 Lab — Understanding Super-Loops
 
 > **Mentor's note.** Before you appreciate what an RTOS gives you, you have to feel life without
 > one. This week you build the simplest possible "scheduler" — a super-loop — and run straight
@@ -20,9 +20,9 @@ We'll ask it to do something that sounds trivial: blink one LED every **250 ms**
 **750 ms** — at the same time.
 
 1. In Wokwi: **New Project → STM32 → ST Nucleo C031C6** (same board as before).
-2. Paste **[`wokwi/week04/sketch.ino`](../wokwi/week04/sketch.ino)**. *(No library to add this week —
+2. Paste **[`wokwi/week03/sketch.ino`](../wokwi/week03/sketch.ino)**. *(No library to add this week —
    there's no FreeRTOS here. That's the point.)*
-3. In the diagram, add an **LED on PB1** (anode → PB1, cathode → GND) — same as Weeks 1–2.
+3. In the diagram, add an **LED on PB1** (anode → PB1, cathode → GND) — same as Weeks 1–2a.
 4. Press **▶ Play** and open the **Serial Monitor**.
 
 **What you'll see — three failures at once:**
@@ -43,7 +43,7 @@ super-loop gives you no way to say "this critical check matters more than that s
 > **Cast your mind back to Week 1.** Two FreeRTOS *tasks* blinked at 250 ms and 750 ms perfectly and
 > independently — because each task had its own `vTaskDelay`, and the scheduler ran them
 > concurrently. That **decoupling** is the whole reason an RTOS exists. It's exactly what HawkHealth
-> uses (the system you ran in Renode last week), and it's what Week 5 dives into.
+> uses (the system you ran in Renode last week), and it's what Week 4 dives into.
 
 **Checkpoint 1.** You can point to the `!! CRITICAL` line and say why its gap is ~1000 ms instead of
 100 — and why adding jobs makes a super-loop's timing impossible to predict.
@@ -84,10 +84,10 @@ Your spec draft was due last week. **This week it locks.**
 2. **One or two sentences:** why does the CRITICAL job miss its 100 ms deadline, why does the timing
    jitter, and what decouples all of this?
 3. The **link to your (final) interface-spec PR**.
-4. Your **AI Interaction Log** entry for Week 4.
+4. Your **AI Interaction Log** entry for Week 3.
 
 ## What's next
 
-You've felt the super-loop's wall. **Week 5** begins the RTOS: tasks and the scheduler — the tools
+You've felt the super-loop's wall. **Week 4** begins the RTOS: tasks and the scheduler — the tools
 that make HawkHealth's independent, concurrent jobs possible. The simulator shifts from Wokwi to
 **Renode**, and you'll start working in the real codebase.

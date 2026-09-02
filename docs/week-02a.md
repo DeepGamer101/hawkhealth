@@ -89,7 +89,7 @@ FreeRTOS task react to it — the input side of the board, which HawkHealth's CO
 need for real later.
 
 1. In Wokwi: **New Project → STM32 → ST Nucleo C031C6** (same as Week 1).
-2. Paste **[`wokwi/week02/sketch.ino`](../wokwi/week02/sketch.ino)**.
+2. Paste **[`wokwi/week02a/sketch.ino`](../wokwi/week02a/sketch.ino)**.
 3. **Library Manager → + Add → `STM32duino FreeRTOS`** (same library as Week 1).
 4. In the **diagram**, add a **pushbutton**: one leg to pin **PB2**, the diagonal leg to **GND**.
    (The sketch uses the chip's internal pull-up, so the pin reads HIGH until the button pulls it
@@ -105,7 +105,7 @@ RTOS again — plus your first GPIO **input**.
 > because it's simple and reliable in the simulator. On real hardware you'll instead wire the
 > button to an **EXTI interrupt** through the **NVIC** — the same NVIC whose vector slots you
 > found in Part 1b — so the CPU is notified the instant it's pressed, with no polling. That's
-> Week 9. Today, just feel the input working.
+> Week 8. Today, just feel the input working.
 
 **Checkpoint 2.** Clicking the button prints `BUTTON pressed` in the Serial Monitor while the LED
 keeps blinking.
@@ -123,7 +123,7 @@ keeps blinking.
 1. A **screenshot** of your Wokwi button project (Serial Monitor showing `BUTTON pressed`).
 2. Three one-line answers: **where does flash start**, **what's at `0x08000004`**, and **what does
    writing `USART3_TDR` do** — each with the file you found it in.
-3. Your **AI Interaction Log** entry for Week 2.
+3. Your **AI Interaction Log** entry for Week 2a.
 
 ## What you are *not* doing yet
 

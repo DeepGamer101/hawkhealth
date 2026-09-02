@@ -8,7 +8,7 @@
 
 **The idea that ties the whole course together — start noticing it today:** an RTOS is a
 *portable layer*. The task you build in Wokwi this week is the same shape you'll run on the
-STM32F767 in Renode (Week 5) and on real hardware (Week 9). Only the I/O underneath it
+STM32F767 in Renode (Week 4) and on real hardware (Week 8). Only the I/O underneath it
 changes. Watch for that.
 
 **By the end of this lab you will have:**
@@ -38,7 +38,7 @@ whole point of an RTOS.
 > **Why the C031C6 and not our F767?** Wokwi doesn't model the Nucleo-F767ZI — its STM32
 > boards are smaller (the Nucleo-C031C6 is a Cortex-M0+). That's fine, and it's actually the
 > lesson: the *same FreeRTOS task* runs on a tiny M0+ here and on our M7 later. Wokwi is the
-> flight simulator; the real aircraft shows up in Renode in Week 5.
+> flight simulator; the real aircraft shows up in Renode in Week 4.
 
 1. In Wokwi: **New Project → STM32 → ST Nucleo C031C6**. Wokwi creates the board for you.
 2. Open the **`diagram.json`** tab and add a second LED: click **+** (parts), add an **LED**,
@@ -99,7 +99,7 @@ Serial Monitor.
 
 ## Part 2 — Pause it (a 60-second preview of debugging)
 
-You don't need the debugger properly until Week 3, but feel it once now:
+You don't need the debugger properly until Week 2b, but feel it once now:
 
 1. While the sim runs, click the **pause (⏸)** button.
 2. Notice the sim *freezes mid-flight* — both tasks stop. That ability to stop time and look is
@@ -139,7 +139,7 @@ the work.
 
 > *Optional, if you're curious:* the repo builds with one command if you have
 > `arm-none-eabi-gcc` — `make -C firmware`. You don't need to today; we'll build it properly in
-> Renode in Week 5. Reading is this week's job.
+> Renode in Week 4. Reading is this week's job.
 
 **Checkpoint 3.** You can point to `hh_platform.c` and say "this is the I/O seam," and to
 `hh_sensor.c` and say "this is the sensor seam."
