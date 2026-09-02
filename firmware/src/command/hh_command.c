@@ -40,6 +40,5 @@ void HH_Command_Task(void *pv){
     for(;;){
         while (hh_uart_rx_ready()) HH_Command_Feed(hh_uart_getc());
         HH_Health_Heartbeat(HH_TASK_COMMAND);
-        vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
