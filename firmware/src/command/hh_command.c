@@ -35,10 +35,11 @@ void HH_Command_Feed(char c){
     if (c=='\r' || c=='\n'){ s_buf[s_len]=0; if(s_len>0) apply(s_buf); s_len=0; }
     else if (s_len < (int)sizeof(s_buf)-1){ s_buf[s_len++]=c; }
 }
-void HH_Command_Task(void *pv){
-    (void)pv;
-    for(;;){
-        while (hh_uart_rx_ready()) HH_Command_Feed(hh_uart_getc());
-        HH_Health_Heartbeat(HH_TASK_COMMAND);
-    }
+void HH_Command_Task(void *pv) {
+	(void)pv;
+	for (;;) {
+		while (hh_uart_rx_ready()) HH_Command_Feed(hh_uart_getc());
+		HH_Health_Heartbeat(HH_TASK_COMMAND);
+		vTaskDelay(pdMS_TO_TICKS(20));   // <-- restore this: yield so lower tasks run
+	}
 }
