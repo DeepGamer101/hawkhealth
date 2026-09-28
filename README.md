@@ -1,11 +1,6 @@
 # HawkHealth
 
 A bedside patient-vitals monitor, and the codebase you'll live in this semester.
-You inherit it working-but-incomplete and evolve it — super-loop → RTOS → hardware —
-proving every change through simulation, emulation, CI, and the real board.
-
-> **▶ Students start here:** [`docs/student-onboarding.md`](docs/student-onboarding.md) (get your own copy),
-> then [`docs/week-01.md`](docs/week-01.md) (Week 1 lab).
 
 > **Dunwoody Hawks.** HawkHealth watches vitals the way a hawk watches — sharp senses,
 > nothing missed. A monitor that stalls is a monitor that misses an alert.
