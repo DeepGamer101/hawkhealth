@@ -1,0 +1,89 @@
+name: HawkHealth CI
+
+# Every push / PR: build both firmware variants and run them in Renode.
+# Make 'firmware-ci' a REQUIRED status check on main (Settings -> Branches) to gate merges.
+#
+# The whole point of this workflow: CI runs the SAME Renode build students run locally, so
+# "green on my laptop" reliably predicts "green on the baseline." Keep RENODE_BUILD below equal
+# to what everyone runs locally (Week 5 lab, Part 0).
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+env:
+  # ---- THE ONE KNOB ----------------------------------------------------------------------------
+  # The exact board-validated Renode NIGHTLY from https://builds.renode.io/ (NOT the stable
+  # GitHub release). Must equal the build every student runs locally. To move the class to a newer
+  # nightly: change this one line, then have everyone reinstall the matching build locally.
+  RENODE_BUILD: "1.16.1+20260828git00139efee"
+  # --------------------------------------------------------------------------------------------
+
+jobs:
+  firmware-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ARM toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi
+
+      - name: Build (system + testbench)
+        run: |
+          make -C firmware
+          make -C firmware TEST=1
+
+      - name: Publish firmware (.elf) for local Renode runs
+        uses: actions/upload-artifact@v4
+        with:
+          name: hawkhealth-firmware
+          path: firmware/hawkhealth.elf
+          if-no-files-found: error
+
+      - name: Install Renode (same nightly as local dev)
+        run: |
+          set -euo pipefail
+          BASE="https://builds.renode.io"
+          DOTNET="renode-${RENODE_BUILD}.linux-portable-dotnet.tar.gz"
+          PLAIN="renode-${RENODE_BUILD}.linux-portable.tar.gz"
+          mkdir -p renode
+
+          # Prefer the self-contained dotnet portable (no mono needed). If that exact nightly
+          # doesn't ship a dotnet variant, fall back to the plain portable + mono runtime.
+          if wget -q --spider "${BASE}/${DOTNET}"; then
+            echo "Using dotnet portable: ${DOTNET}"
+            wget -q "${BASE}/${DOTNET}" -O renode.tar.gz
+          elif wget -q --spider "${BASE}/${PLAIN}"; then
+            echo "dotnet variant not found; using plain portable + mono: ${PLAIN}"
+            sudo apt-get install -y mono-complete
+            wget -q "${BASE}/${PLAIN}" -O renode.tar.gz
+          else
+            echo "::error::Neither ${DOTNET} nor ${PLAIN} found on ${BASE}."
+            echo "::error::The pinned nightly may have been pruned. Pick a current build from"
+            echo "::error::https://builds.renode.io/ and update RENODE_BUILD in this workflow."
+            exit 1
+          fi
+
+          tar xzf renode.tar.gz -C renode --strip-components=1
+          # Sanity: fail fast (and visibly) if the version isn't what we pinned.
+          ./renode/renode --version || true
+          pip install -r renode/tests/requirements.txt
+
+      - name: Run Renode tests (the gate)
+        run: |
+          ./renode/renode-test tests/system.robot
+          ./renode/renode-test tests/integration.robot
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: renode-results
+          path: |
+            *.xml
+            log.html
+            report.html
+          if-no-files-found: ignore

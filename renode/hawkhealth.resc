@@ -1,0 +1,14 @@
+:name: HawkHealth (STM32F767)
+:description: Run the HawkHealth system in Renode and watch its telemetry on USART3.
+#
+# EDIT the two absolute paths below for YOUR machine (forward slashes, no quotes):
+#   1) the platform file in your clone:  <clone>/platforms/hawkhealth_f767.repl
+#   2) the firmware you downloaded from Actions -> hawkhealth-firmware -> hawkhealth.elf
+#
+using sysbus
+mach create "hawkhealth"
+machine LoadPlatformDescription @C:/Users/you/CENG4200/hawkhealth/platforms/hawkhealth_f767.repl
+sysbus LoadELF @C:/Users/you/Downloads/hawkhealth.elf
+showAnalyzer sysbus.usart3
+#
+# then, at the (hawkhealth) monitor prompt:  start

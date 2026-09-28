@@ -1,0 +1,19 @@
+:name: HawkHealth (STM32F767) — local dev
+:description: Watch HawkHealth telemetry on USART3, using your locally built firmware.
+#
+# ZERO EDITS NEEDED — if you launch Renode FROM YOUR CLONE ROOT, e.g.:
+#     cd <your-clone>            # the folder containing firmware/ platforms/ tests/
+#     renode renode/hawkhealth-local.resc
+# then the relative @paths below resolve to your just-built ELF and the board model.
+# (If you launch Renode from somewhere else, either cd to the clone first, or use the
+#  original renode/hawkhealth.resc with absolute paths.)
+#
+using sysbus
+mach create "hawkhealth"
+machine LoadPlatformDescription @platforms/hawkhealth_f767.repl
+sysbus LoadELF @firmware/hawkhealth.elf
+showAnalyzer sysbus.usart3
+#
+# Then, at the (hawkhealth) monitor prompt:  start
+# Watch for:  call 300 -> temp 38.5 -> alert=HIGH ;  call 500 -> spo2 88.0 -> alert=CRITICAL
+# Rebuilt the firmware? At the prompt:  Reset  then  sysbus LoadELF @firmware/hawkhealth.elf  then  start
