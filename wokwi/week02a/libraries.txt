@@ -1,2 +1,0 @@
-# If Wokwi doesn't auto-load it: Library Manager -> + Add -> "STM32duino FreeRTOS".
-STM32duino FreeRTOS
