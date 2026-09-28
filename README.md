@@ -37,7 +37,7 @@ There is **no `PLATFORM_FVP` fork**. Because Renode models the real STM32F767, t
 ## Run it in Renode (same as CI)
 
 ```bash
-# one-time: install Renode (see docs/week-05.md Part 0/5 for the exact class-standard build)
+# one-time: install Renode 
 renode-test tests/system.robot                  # boots, streams telemetry, injected faults raise alerts
 renode-test tests/integration.robot             # TEST=1 build: 500 reads, PASS lines
 ```
