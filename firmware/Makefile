@@ -33,6 +33,9 @@ SRC := src/app/main.c \
        $(KERNEL)/tasks.c $(KERNEL)/list.c $(KERNEL)/queue.c \
        $(PORT)/port.c $(KERNEL)/portable/MemMang/heap_4.c
 
+.PHONY: all clean
+all: $(TARGET)
+
 $(TARGET): $(SRC)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(SRC) -o $@
 	$(SIZE) $@
