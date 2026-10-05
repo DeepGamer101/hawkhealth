@@ -17,21 +17,15 @@ else
 TARGET := hawkhealth.elf
 endif
 
-SRC := src/app/main.c \
-       src/app/hh_app.c \
-       src/app/integration_test.c \
-       src/app/hh_hooks.c \
-       src/sensor/hh_sensor.c \
-       src/filter/hh_filter.c \
-       src/alert/hh_alert.c \
-       src/telemetry/hh_telemetry.c \
-       src/command/hh_command.c \
-       src/config/hh_config.c \
-       src/health/hh_health.c \
-       src/platform/hh_platform.c \
-       src/startup/startup_stm32f767.c \
-       $(KERNEL)/tasks.c $(KERNEL)/list.c $(KERNEL)/queue.c \
-       $(PORT)/port.c $(KERNEL)/portable/MemMang/heap_4.c
+APP_SRC := $(wildcard src/*/*.c)
+
+KERNEL_SRC := $(KERNEL)/tasks.c \
+              $(KERNEL)/list.c \
+              $(KERNEL)/queue.c \
+              $(PORT)/port.c \
+              $(KERNEL)/portable/MemMang/heap_4.c
+
+SRC := $(APP_SRC) $(KERNEL_SRC)
 
 .PHONY: all clean
 all: $(TARGET)
