@@ -58,4 +58,4 @@ The sensor stub is deterministic — no `rand()` — so CI is reproducible:
 This foundation was built and run end-to-end before hand-off: both variants compile with
 `arm-none-eabi-gcc` and pass their Renode Robot suites (FreeRTOS scheduler, SysTick tick,
 USART3 telemetry, sensor stub, injected faults, PASS verdict).
-Verification
+Verification again
